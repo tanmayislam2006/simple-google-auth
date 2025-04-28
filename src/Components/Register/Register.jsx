@@ -62,8 +62,14 @@ const Register = () => {
     // Proceed with Firebase registration
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
-        toast.success("Successfully Registered");
+
         console.log(result);
+        if(!result.user.emailVerified){
+          toast.warn("please verify your email")
+        }
+        else{
+          toast.success("Successfully Registered");
+        }
         setIsLoading(false);
       })
       .catch((error) => {

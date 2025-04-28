@@ -1,5 +1,11 @@
 import React, { useRef, useState } from "react";
-import { GoogleAuthProvider, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
 import auth from "../../firebase/firebase.init";
 import { toast } from "react-toastify";
 import { Link } from "react-router";
@@ -8,6 +14,7 @@ const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const [user, setUser] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const googleProvider = new GoogleAuthProvider();
 
@@ -35,37 +42,44 @@ const Login = () => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-     signInWithEmailAndPassword(auth,email,password)
-     .then((result)=>{
-      toast.success("successfully log in")
-      console.log(result.user);
-     })
-     .catch((error)=>{
-      console.log(error);
-     })
+    setErrorMessage("");
+    signInWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        toast.success("successfully log in");
+        console.log(result.user);
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+      });
   };
- const handleForgotPassword=()=>{
-  const email=emailRef.current.value
-  sendPasswordResetEmail(auth,email)
-  .then(()=>{
-    toast.success("send an email on your register email")
-  })
-  .catch((error)=>{
-    console.log(error);
-  })
- }
+  const handleForgotPassword = () => {
+    const email = emailRef.current.value;
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        toast.success("send an email on your register email");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-80 bg-white shadow-lg rounded-lg p-6">
         {user?.displayName && (
-          <p className="text-center font-bold text-2xl mb-8">{user.displayName}</p>
+          <p className="text-center font-bold text-2xl mb-8">
+            {user.displayName}
+          </p>
         )}
         {user?.email && (
           <p className="text-center font-bold text-2xl mb-8">{user.email}</p>
         )}
         {user?.photoURL && (
           <div className="rounded-full flex justify-center">
-            <img className="rounded-full" src={user.photoURL} alt="User Profile" />
+            <img
+              className="rounded-full"
+              src={user.photoURL}
+              alt="User Profile"
+            />
           </div>
         )}
         <p className="text-center font-bold text-2xl mb-8">Welcome back</p>
@@ -131,6 +145,11 @@ const Login = () => {
             >
               <span className="text-xs font-semibold">Log in with Google</span>
             </button>
+          )}
+          {errorMessage && (
+            <div className="bg-red-500 text-white p-2 rounded-md">
+              {errorMessage}
+            </div>
           )}
         </div>
       </div>
